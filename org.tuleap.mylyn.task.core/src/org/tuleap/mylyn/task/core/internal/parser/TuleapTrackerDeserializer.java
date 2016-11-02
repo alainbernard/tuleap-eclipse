@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Obeo.
+ * Copyright (c) 2013,2016 Obeo and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     Obeo - initial API and implementation
+ *     A. Bernard - temporary fix for user group fields
  *******************************************************************************/
 package org.tuleap.mylyn.task.core.internal.parser;
 
@@ -252,7 +253,8 @@ public class TuleapTrackerDeserializer implements JsonDeserializer<TuleapTracker
 			JsonArray typeFieldsArray = jsonFields.getAsJsonArray();
 			for (JsonElement fieldElt : typeFieldsArray) {
 				JsonObject field = (JsonObject)fieldElt;
-				AbstractTuleapField tuleapField = getField(field, tracker, jsonObject, fieldSemantic, context);
+				AbstractTuleapField tuleapField = getField(field, tracker, jsonObject, fieldSemantic,
+						context);
 				if (tuleapField != null) {
 					tracker.addField(tuleapField);
 				}
@@ -260,7 +262,8 @@ public class TuleapTrackerDeserializer implements JsonDeserializer<TuleapTracker
 		} else if (jsonFields.isJsonObject()) {
 			for (Entry<String, JsonElement> entry : jsonFields.getAsJsonObject().entrySet()) {
 				JsonObject field = (JsonObject)entry.getValue();
-				AbstractTuleapField tuleapField = getField(field, tracker, jsonObject, fieldSemantic, context);
+				AbstractTuleapField tuleapField = getField(field, tracker, jsonObject, fieldSemantic,
+						context);
 				if (tuleapField != null) {
 					tracker.addField(tuleapField);
 				}
@@ -319,7 +322,12 @@ public class TuleapTrackerDeserializer implements JsonDeserializer<TuleapTracker
 			JsonObject fieldBinding = null;
 			JsonElement valuesElement = field.get(VALUES);
 			if (valuesElement != null && !valuesElement.isJsonNull()) {
-				fieldValuesArray = valuesElement.getAsJsonArray();
+				if (valuesElement.isJsonArray()) {
+					fieldValuesArray = valuesElement.getAsJsonArray();
+				} else {
+					fieldValuesArray = new JsonArray();
+				}
+
 			}
 			JsonElement bindingElement = field.get(BINDINGS);
 			if (bindingElement != null && !bindingElement.isJsonNull()) {
@@ -490,10 +498,9 @@ public class TuleapTrackerDeserializer implements JsonDeserializer<TuleapTracker
 		}
 
 		// the semantic contributors part
-		if (fieldSemantic != null
-				&& fieldSemantic.get(JSON_CONTRIBUTOR) != null
-				&& fieldSemantic.get(JSON_CONTRIBUTOR).getAsJsonObject().get(FIELD_ID).getAsInt() == selectBoxField
-				.getIdentifier()) {
+		if (fieldSemantic != null && fieldSemantic.get(JSON_CONTRIBUTOR) != null && fieldSemantic.get(
+				JSON_CONTRIBUTOR).getAsJsonObject().get(FIELD_ID).getAsInt() == selectBoxField
+						.getIdentifier()) {
 			selectBoxField.setSemanticContributor(true);
 		}
 	}
@@ -518,7 +525,7 @@ public class TuleapTrackerDeserializer implements JsonDeserializer<TuleapTracker
 			for (int z = 0; z < semanticStatus.get(JSON_STATUS_IDS).getAsJsonArray().size(); z++) {
 				if (selectBoxField.getIdentifier() == semanticStatus.get(FIELD_ID).getAsInt()
 						&& fieldValueId == semanticStatus.get(JSON_STATUS_IDS).getAsJsonArray().get(z)
-						.getAsInt()) {
+								.getAsInt()) {
 					selectBoxField.getOpenStatus().add(selectBoxItem);
 				}
 			}

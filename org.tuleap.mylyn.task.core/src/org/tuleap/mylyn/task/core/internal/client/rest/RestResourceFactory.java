@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 Obeo.
+ * Copyright (c) 2013, 2016 Obeo and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,19 +7,21 @@
  *
  * Contributors:
  *     Obeo - initial API and implementation
+ *     A. Bernard - remove use of API version but still keep two constructors
+ *         for compatibility with tests
  *******************************************************************************/
 package org.tuleap.mylyn.task.core.internal.client.rest;
+
+import static org.tuleap.mylyn.task.core.internal.client.rest.RestResource.DELETE;
+import static org.tuleap.mylyn.task.core.internal.client.rest.RestResource.GET;
+import static org.tuleap.mylyn.task.core.internal.client.rest.RestResource.POST;
+import static org.tuleap.mylyn.task.core.internal.client.rest.RestResource.PUT;
 
 import com.google.gson.Gson;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.ILog;
 import org.tuleap.mylyn.task.core.internal.client.rest.RestResource.URL;
-
-import static org.tuleap.mylyn.task.core.internal.client.rest.RestResource.DELETE;
-import static org.tuleap.mylyn.task.core.internal.client.rest.RestResource.GET;
-import static org.tuleap.mylyn.task.core.internal.client.rest.RestResource.POST;
-import static org.tuleap.mylyn.task.core.internal.client.rest.RestResource.PUT;
 
 /**
  * Builder class that instantiates the accessible JSON services.
@@ -42,11 +44,6 @@ public final class RestResourceFactory {
 	 * The best version of the API supported by the connector.
 	 */
 	public static final String BEST_VERSION = V1;
-
-	/**
-	 * The version of the API to use.
-	 */
-	private final String apiVersion;
 
 	/**
 	 * The connector to use.
@@ -76,8 +73,25 @@ public final class RestResourceFactory {
 	 *            The logger to use.
 	 */
 	public RestResourceFactory(String apiVersion, IRestConnector connector, Gson gson, ILog logger) {
-		Assert.isNotNull(apiVersion);
-		this.apiVersion = apiVersion;
+		Assert.isNotNull(connector);
+		this.connector = connector;
+		Assert.isNotNull(gson);
+		this.gson = gson;
+		Assert.isNotNull(logger);
+		this.logger = logger;
+	}
+
+	/**
+	 * Constructor.
+	 *
+	 * @param connector
+	 *            The connector to use.
+	 * @param gson
+	 *            The {@link Gson} to use.
+	 * @param logger
+	 *            The logger to use.
+	 */
+	public RestResourceFactory(IRestConnector connector, Gson gson, ILog logger) {
 		Assert.isNotNull(connector);
 		this.connector = connector;
 		Assert.isNotNull(gson);
@@ -290,11 +304,11 @@ public final class RestResourceFactory {
 		Assert.isNotNull(urlFragments);
 		Assert.isTrue(urlFragments.length > 0);
 		StringBuilder b = new StringBuilder();
-		b.append(API_PREFIX).append(apiVersion);
+		b.append(API_PREFIX);// .append(apiVersion);
 		String string = urlFragments[0];
-		if (string.charAt(0) != '/') {
-			b.append('/');
-		}
+		// if (string.charAt(0) != '/') {
+		// b.append('/');
+		// }
 		b.append(string);
 		int i = 1;
 		while (i < urlFragments.length) {

@@ -1,12 +1,13 @@
 /*******************************************************************************
- * Copyright (c) 2013 Obeo.
+ * Copyright (c) 2013,2016 Obeo and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Obeo - initial API and implementation
+ *     A. Bernard - Added 201 status
  *******************************************************************************/
 package org.tuleap.mylyn.task.core.internal.client.rest;
 
@@ -14,7 +15,7 @@ import java.util.Map;
 
 /**
  * Utility class used to store the responses of the server.
- * 
+ *
  * @author <a href="mailto:stephane.begaudeau@obeo.fr">Stephane Begaudeau</a>
  */
 public class ServerResponse {
@@ -23,6 +24,11 @@ public class ServerResponse {
 	 * OK - 200.
 	 */
 	public static final int STATUS_OK = 200;
+
+	/**
+	 * Created - 201.
+	 */
+	public static final int STATUS_CREATED = 201;
 
 	/**
 	 * Moved - 301.
@@ -91,7 +97,7 @@ public class ServerResponse {
 
 	/**
 	 * The constructor.
-	 * 
+	 *
 	 * @param status
 	 *            The status
 	 * @param body
@@ -107,7 +113,7 @@ public class ServerResponse {
 
 	/**
 	 * Returns the status.
-	 * 
+	 *
 	 * @return The status
 	 */
 	public int getStatus() {
@@ -116,7 +122,7 @@ public class ServerResponse {
 
 	/**
 	 * Returns the body.
-	 * 
+	 *
 	 * @return The body
 	 */
 	public String getBody() {
@@ -125,7 +131,7 @@ public class ServerResponse {
 
 	/**
 	 * Returns the headers.
-	 * 
+	 *
 	 * @return The headers
 	 */
 	public Map<String, String> getHeaders() {
@@ -133,11 +139,11 @@ public class ServerResponse {
 	}
 
 	/**
-	 * Indicates whether the status code of this response is OK (200).
-	 * 
-	 * @return <code>true</code> if and only if the status of this response is OK (200).
+	 * Indicates whether the status code of this response is OK (200) or CREATED (201).
+	 *
+	 * @return <code>true</code> if and only if the status of this response is OK (200) or CREATED (201).
 	 */
 	public boolean isOk() {
-		return status == STATUS_OK;
+		return status == STATUS_OK || status == STATUS_CREATED;
 	}
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012, 2013 Obeo.
+ * Copyright (c) 2012, 2016 Obeo and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     Obeo - initial API and implementation
+ *     A. Bernard - fix NPE issue on tracker selection
  *******************************************************************************/
 package org.tuleap.mylyn.task.ui.internal.wizards;
 
@@ -80,6 +81,11 @@ public class TuleapTrackerPage extends WizardPage {
 	private Label trackerDescriptionLabel;
 
 	/**
+	 * The currently selected tracker
+	 */
+	private TuleapTracker trackerSelected;
+
+	/**
 	 * The constructor.
 	 *
 	 * @param project
@@ -137,10 +143,15 @@ public class TuleapTrackerPage extends WizardPage {
 
 			@Override
 			public void selectionChanged(SelectionChangedEvent event) {
-				TuleapTracker trackerSelected = TuleapTrackerPage.this.getTrackerSelected();
+				IStructuredSelection selection = (IStructuredSelection)trackerTree.getViewer().getSelection();
+				if (selection.getFirstElement() instanceof TuleapTracker) {
+					TuleapTrackerPage.this.trackerSelected = (TuleapTracker)selection.getFirstElement();
+				} else {
+					TuleapTrackerPage.this.trackerSelected = null;
+				}
 				if (trackerSelected == null) {
-					TuleapTrackerPage.this.setErrorMessage(TuleapUIMessages
-							.getString(TuleapUIKeys.tuleapTrackerPageSelectATracker));
+					TuleapTrackerPage.this.setErrorMessage(TuleapUIMessages.getString(
+							TuleapUIKeys.tuleapTrackerPageSelectATracker));
 				} else {
 					TuleapTrackerPage.this.setErrorMessage(null);
 					TuleapTrackerPage.this.setMessage(null);
@@ -206,11 +217,12 @@ public class TuleapTrackerPage extends WizardPage {
 	 * @return The tracker where the new task should be created.
 	 */
 	public TuleapTracker getTrackerSelected() {
-		IStructuredSelection selection = (IStructuredSelection)this.trackerTree.getViewer().getSelection();
-		if (selection.getFirstElement() instanceof TuleapTracker) {
-			return (TuleapTracker)selection.getFirstElement();
-		}
-		return null;
+		return trackerSelected;
+		// IStructuredSelection selection = (IStructuredSelection)this.trackerTree.getViewer().getSelection();
+		// if (selection.getFirstElement() instanceof TuleapTracker) {
+		// return (TuleapTracker)selection.getFirstElement();
+		// }
+		// return null;
 	}
 
 	/**
@@ -220,7 +232,7 @@ public class TuleapTrackerPage extends WizardPage {
 	 */
 	@Override
 	public boolean isPageComplete() {
-		return this.getTrackerSelected() != null;
+		return getTrackerSelected() != null;
 	}
 
 	/**

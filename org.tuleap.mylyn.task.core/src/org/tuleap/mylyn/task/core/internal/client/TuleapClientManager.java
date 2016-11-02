@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2012 Obeo.
+ * Copyright (c) 2012, 2016 Obeo and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     Obeo - initial API and implementation
+ *     A. Bernard - remove use of API version for REST services
  *******************************************************************************/
 package org.tuleap.mylyn.task.core.internal.client;
 
@@ -82,8 +83,8 @@ public class TuleapClientManager implements IRepositoryListener {
 	 */
 	private void refreshClients(TaskRepository taskRepository) {
 		// Create both clients
-		final AbstractWebLocation webLocation = new TaskRepositoryLocationFactory()
-		.createWebLocation(taskRepository);
+		final AbstractWebLocation webLocation = new TaskRepositoryLocationFactory().createWebLocation(
+				taskRepository);
 
 		ILog logger = Platform.getLog(Platform.getBundle(TuleapCoreActivator.PLUGIN_ID));
 
@@ -92,8 +93,8 @@ public class TuleapClientManager implements IRepositoryListener {
 
 		restConnectors.add(tuleapRestConnector);
 
-		RestResourceFactory restResourceFactory = new RestResourceFactory(RestResourceFactory.BEST_VERSION,
-				tuleapRestConnector, gson, TuleapCoreActivator.getDefault().getLog());
+		RestResourceFactory restResourceFactory = new RestResourceFactory(tuleapRestConnector, gson,
+				TuleapCoreActivator.getDefault().getLog());
 		TuleapRestClient tuleapRestClient = new TuleapRestClient(restResourceFactory, gson, taskRepository);
 		this.restClientCache.put(taskRepository, tuleapRestClient);
 	}
